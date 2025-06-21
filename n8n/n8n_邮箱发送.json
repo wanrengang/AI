@@ -1,0 +1,190 @@
+{
+  "name": "晨报每天推送",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "你是一个专业的早报编辑和资讯整理专家。\n\n你的任务是每天抓取并整理全球最新的热门资讯，并以特定的格式输出一份“每日早报”。\n\n请严格遵循以下格式要求和内容规范：\n\n---\n**【输出格式示例】**\n\n请严格按照以下示例格式生成每日早报内容。**每一条资讯前必须有编号，且编号后紧跟中文顿号“、”**。\n\n【早报】早上好！[当前日期，格式：X月X日] 星期[当前星期几] 农历[农历日期，例如：五月廿六] [节气，如果当天是，例如：夏至]\n\n1、[第一条热门资讯内容]；\n\n2、[第二条热门资讯内容]；\n\n3、[第三条热门资讯内容]；\n... (省略部分，直到13条)\n13、[第十三条热门资讯内容]；\n\n【微语】[一句积极向上、富有哲理的短语，与季节、时间或生活感悟相关]\n\n---\n**【内容规范】**\n\n1.  **资讯来源：** 请从全球主流新闻媒体、官方发布渠道、权威机构报告中获取。确保资讯的真实性、时效性和权威性。\n2.  **资讯类型：** 涵盖但不限于时政、经济、科技、社会、文化、体育、国际事件等多个领域的热门新闻。\n3.  **资讯数量：** 严格控制在13条。请确保每条资讯都是独立的、有价值的。\n4.  **资讯长度：** 每条资讯内容应简洁明了，突出核心信息，长度适中，以便快速阅读。避免冗长描述。\n5.  **日期与节气：**\n    * **当前日期：** 自动填充为当天的公历日期（例如：6月21日）。\n    * **当前星期几：** 自动填充为当天的星期几。\n    * **农历日期：** 自动填充为当天的农历日期（例如：五月廿六）。\n    * **节气：** 如果当天是二十四节气之一，请显示对应的节气名称，否则留空。\n6.  **微语：** 生成一段积极向上、富有哲理的短语，长度控制在20-30字。内容应与早报主题相关，或提供一些生活感悟。\n\n**【请开始生成今天的早报】**",
+        "options": {
+          "systemMessage": "你是一个专业的早报编辑和资讯整理专家。\n\n你的任务是每天抓取并整理全球最新的热门资讯，并以特定的格式输出一份“每日早报”。\n\n内容以markdown格式输出；\n请严格遵循以下格式要求和内容规范：\n\n---\n**【输出格式示例】**\n\n请严格按照以下示例格式生成每日早报内容。**每一条资讯前必须有编号，且编号后紧跟中文顿号“、”**  每一条一行，不要混在一起。\n\n【早报】早上好！[当前日期，格式：X月X日] 星期[当前星期几] 农历[农历日期，例如：五月廿六] [节气，如果当天是，例如：夏至]\n\n1、[第一条热门资讯内容]；\n\n2、[第二条热门资讯内容]；\n\n3、[第三条热门资讯内容]；\n... (省略部分，直到13条)\n13、[第十三条热门资讯内容]；\n\n【微语】[一句积极向上、富有哲理的短语，与季节、时间或生活感悟相关]\n\n---\n**【内容规范】**\n\n1.  **资讯来源：** 请从全球主流新闻媒体、官方发布渠道、权威机构报告中获取。确保资讯的真实性、时效性和权威性。\n2.  **资讯类型：** 涵盖但不限于时政、经济、科技、社会、文化、体育、国际事件等多个领域的热门新闻。\n3.  **资讯数量：** 严格控制在13条。请确保每条资讯都是独立的、有价值的。\n4.  **资讯长度：** 每条资讯内容应简洁明了，突出核心信息，长度适中，以便快速阅读。避免冗长描述。\n5.  **日期与节气：**\n    * **当前日期：** 自动填充为当天的公历日期（例如：6月21日）。\n    * **当前星期几：** 自动填充为当天的星期几。\n    * **农历日期：** 自动填充为当天的农历日期（例如：五月廿六）。\n    * **节气：** 如果当天是二十四节气之一，请显示对应的节气名称，否则留空。\n6.  **微语：** 生成一段积极向上、富有哲理的短语，长度控制在20-30字。内容应与早报主题相关，或提供一些生活感悟。\n\n**【请开始生成今天的早报】**"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        120,
+        -20
+      ],
+      "id": "1de38f5c-0f39-4722-9de8-37e763c6bfee",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        80,
+        180
+      ],
+      "id": "68780700-9a18-417c-9aa3-5e52acf807d8",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "h0Lop1ZkIOgViFBz",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "wanrengang1688@163.com",
+        "toEmail": "365700955@qq.com",
+        "subject": "每日科技资讯",
+        "html": "={{ $json.data }}------来自万智创界",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        740,
+        -20
+      ],
+      "id": "424f8cf1-53a2-49d5-81ad-6ad01019f1c3",
+      "name": "Send Email",
+      "webhookId": "1c1a3628-ce01-4681-a678-6b8f2e38291f",
+      "credentials": {
+        "smtp": {
+          "id": "vUX0x9vzPvEWBpzA",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        380,
+        200
+      ],
+      "id": "f191435d-7aec-4ba3-b7cb-a47ce028b51a",
+      "name": "SerpAPI",
+      "credentials": {
+        "serpApi": {
+          "id": "XLQEapytpcay79Nj",
+          "name": "SerpApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "markdownToHtml",
+        "markdown": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        520,
+        -20
+      ],
+      "id": "7671b3b6-67f5-4b42-b587-658ee809c9ee",
+      "name": "Markdown格式转HTML"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -100,
+        -20
+      ],
+      "id": "5c57eb00-cc32-46ce-bdc6-8489e8af8da9",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Markdown格式转HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown格式转HTML": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5dc14611-d4be-4490-881e-66653bcaf090",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a2cb288ba7542e0372d2a4cef94fccbcb44e1e46acff368e7edf80b48ff431a1"
+  },
+  "id": "n1xDiAY4IeNoAesL",
+  "tags": []
+}
