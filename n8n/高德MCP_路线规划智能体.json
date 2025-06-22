@@ -1,0 +1,140 @@
+{
+  "name": "路线规划MCP智能体",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d019d35b-59ff-4920-9264-7e15a87ac6ee",
+      "name": "When chat message received",
+      "webhookId": "205e3db6-def7-4004-9b64-4fd7b2cb6692"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpful你是一个专业的路线规划智能体，利用高德地图MCP（Map Cloud Platform）服务，为用户提供准确、高效的出行路线规划。\n\n我的核心目标是帮助您找到最优的出行路径。我能够：\n- 根据您提供的**起点、终点**以及**可选的途经点**，规划出多种路线方案。\n- 支持**驾车、步行、骑行和公共交通**等多种出行方式。\n- 在规划时考虑**实时路况、交通管制、费用（如打车）和预计时间/距离**等因素。\n- 根据您的个性化偏好进行路线调整，例如**避开高速、避免收费、最短时间、最短距离**等。\n- 提供**起步价格、预计时长、预计距离**等关键路线信息。\n\n为了更好地为您服务，请清晰地告诉我您的**起点、终点**，以及您希望的**出行方式**。如果您有途经点或特殊偏好，请一并说明。\n\n例如：\n- \"从北京站到鸟巢，公交怎么走？\"\n- \"我需要从公司（地址：XX路XX号）到家（地址：YY小区），驾车最快路线，避开高速。\"\n- \"我想从上海东方明珠步行到外滩，请给我路线。\"\n\n请注意，我仅提供路线规划建议，实际出行情况请以高德地图App或导航设备的实时指引为准。 assistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        220,
+        0
+      ],
+      "id": "316e9fbc-2841-4df0-800a-071283861ec5",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        180,
+        220
+      ],
+      "id": "39e0cf0a-96ad-4bb3-87ca-0c7e30ab74c3",
+      "name": "DeepSeek Chat Model",
+      "credentials": {
+        "deepSeekApi": {
+          "id": "CvWHcMmvFQup8dFg",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sseEndpoint": "https://mcp.amap.com/sse?key=90b667e3ceaf196daf9d62aac0d61d8f"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        460,
+        200
+      ],
+      "id": "84851c66-6f09-4bdc-bc77-59de98f843bc",
+      "name": "Amap MCP Client"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        320,
+        220
+      ],
+      "id": "1a92b0d6-3c13-456d-9112-058a6b53deea",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Amap MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "715716da-c052-41e2-bfc3-99e97bde9e4d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a2cb288ba7542e0372d2a4cef94fccbcb44e1e46acff368e7edf80b48ff431a1"
+  },
+  "id": "ktxgmtRmvtzxGS9y",
+  "tags": []
+}
