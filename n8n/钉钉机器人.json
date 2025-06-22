@@ -1,0 +1,269 @@
+{
+  "name": "钉钉机器人对接",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        -140
+      ],
+      "id": "f34d629b-3950-4872-9f8b-7ad589892a26",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://oapi.dingtalk.com/robot/send?access_token=ad142a882de73adadeb5456d10abef831bdba796d9935b4f170bcef38f343d66&timestamp={{ $json.timestamp }}&sign={{ $json.sign }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"msgtype\": \"markdown\",\n  \"markdown\": {\n    \"title\": \"早报\",\n    \"text\": {{ JSON.stringify($json.output) }}\n  },\n  \"at\": {\n    \"isAtAll\": true\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        -120
+      ],
+      "id": "8cb479a9-6cf2-4411-89a9-7d2fcccd2c73",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "#python 3.8\nimport time\nimport hmac\nimport hashlib\nimport base64\nimport urllib.parse\n\ntimestamp = str(round(time.time() * 1000))\nsecret = 'SEC32e4c33dfe9835d83ad9216d09273721e4b9a865c6d71918fcb86c85e3fd238c'\nsecret_enc = secret.encode('utf-8')\nstring_to_sign = '{}\\n{}'.format(timestamp, secret)\nstring_to_sign_enc = string_to_sign.encode('utf-8')\nhmac_code = hmac.new(secret_enc, string_to_sign_enc, digestmod=hashlib.sha256).digest()\nsign = urllib.parse.quote_plus(base64.b64encode(hmac_code))\n\n# 按照要求构造返回数据\nresult = [{\"timestamp\": timestamp, \"sign\": sign}]\nprint(result)  # 这里可以根据实际情况决定是否打印，重点是返回正确的格式\nreturn result  # 确保函数有返回值，这里假设代码是在一个函数内部运行，如果是脚本形式，也可以直接使用return语句，或者根据具体平台要求调整输出方式"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        160
+      ],
+      "id": "80284a94-39db-43cc-99a2-27d10893d23f",
+      "name": "签名处理"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "78696a3e-4639-43b9-8e4e-e0e8dc58686f",
+              "name": "timestamp",
+              "value": "={{ new Date().getTime() }}",
+              "type": "string"
+            },
+            {
+              "id": "4f482c5d-6cbf-41fa-9d27-3c710e65fa84",
+              "name": "secret",
+              "value": "SEC32e4c33dfe9835d83ad9216d09273721e4b9a865c6d71918fcb86c85e3fd238c",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        160,
+        160
+      ],
+      "id": "1edd05a6-f3ed-4371-8fa0-1e3437d8c4e9",
+      "name": "变量设置"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "你是一个专业的早报编辑和资讯整理专家。\n\n你的任务是每天抓取并整理全球最新的热门资讯，并以特定的格式输出一份“每日早报”。\n\n请严格遵循以下格式要求和内容规范：\n\n---\n**【输出格式示例】**\n\n请严格按照以下示例格式生成每日早报内容。**每一条资讯前必须有编号，且编号后紧跟中文顿号“、”**。\n\n【早报】早上好！[当前日期，格式：X月X日] 星期[当前星期几] 农历[农历日期，例如：五月廿六] [节气，如果当天是，例如：夏至]\n\n1、[第一条热门资讯内容]；\n\n2、[第二条热门资讯内容]；\n\n3、[第三条热门资讯内容]；\n... (省略部分，直到13条)\n13、[第十三条热门资讯内容]；\n\n【微语】[一句积极向上、富有哲理的短语，与季节、时间或生活感悟相关]\n\n---\n**【内容规范】**\n\n1.  **资讯来源：** 请从全球主流新闻媒体、官方发布渠道、权威机构报告中获取。确保资讯的真实性、时效性和权威性。\n2.  **资讯类型：** 涵盖但不限于时政、经济、科技、社会、文化、体育、国际事件等多个领域的热门新闻。\n3.  **资讯数量：** 严格控制在13条。请确保每条资讯都是独立的、有价值的。\n4.  **资讯长度：** 每条资讯内容应简洁明了，突出核心信息，长度适中，以便快速阅读。避免冗长描述。\n5.  **日期与节气：**\n    * **当前日期：** 自动填充为当天的公历日期（例如：6月21日）。\n    * **当前星期几：** 自动填充为当天的星期几。\n    * **农历日期：** 自动填充为当天的农历日期（例如：五月廿六）。\n    * **节气：** 如果当天是二十四节气之一，请显示对应的节气名称，否则留空。\n6.  **微语：** 生成一段积极向上、富有哲理的短语，长度控制在20-30字。内容应与早报主题相关，或提供一些生活感悟。\n\n**【请开始生成今天的早报】**",
+        "options": {
+          "systemMessage": "你是一个专业的早报编辑和资讯整理专家。\n\n你的任务是每天抓取并整理全球最新的热门资讯，并以特定的格式输出一份“每日早报”。\n\n内容以markdown格式输出，要求每条数据生成两个换行符；\n请严格遵循以下格式要求和内容规范：\n\n---\n**【输出格式示例】**\n\n请严格按照以下示例格式生成每日早报内容。**每一条资讯前必须有编号，且编号后紧跟中文顿号“、”**  每一条一行，不要混在一起。\n\n【早报】早上好！[当前日期，格式：X月X日] 星期[当前星期几] 农历[农历日期，例如：五月廿六] [节气，如果当天是，例如：夏至]\n\n1、[第一条热门资讯内容]；\n\n2、[第二条热门资讯内容]；\n\n3、[第三条热门资讯内容]；\n... (省略部分，直到13条)\n13、[第十三条热门资讯内容]；\n\n【微语】[一句积极向上、富有哲理的短语，与季节、时间或生活感悟相关]\n\n---\n**【内容规范】**\n\n1.  **资讯来源：** 请从全球主流新闻媒体、官方发布渠道、权威机构报告中获取。确保资讯的真实性、时效性和权威性。\n2.  **资讯类型：** 涵盖但不限于时政、经济、科技、社会、文化、体育、国际事件等多个领域的热门新闻。\n3.  **资讯数量：** 严格控制在13条。请确保每条资讯都是独立的、有价值的。\n4.  **资讯长度：** 每条资讯内容应简洁明了，突出核心信息，长度适中，以便快速阅读。避免冗长描述。\n5.  **日期与节气：**\n    * **当前日期：** 自动填充为当天的公历日期（例如：6月21日）。\n    * **当前星期几：** 自动填充为当天的星期几。\n    * **农历日期：** 自动填充为当天的农历日期（例如：五月廿六）。\n    * **节气：** 如果当天是二十四节气之一，请显示对应的节气名称，否则留空。\n6.  **微语：** 生成一段积极向上、富有哲理的短语，长度控制在20-30字。内容应与早报主题相关，或提供一些生活感悟。\n\n**【请开始生成今天的早报】**"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        220,
+        -400
+      ],
+      "id": "7c1c500b-4707-4020-bbb4-43c7ded8ba28",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        220,
+        -180
+      ],
+      "id": "4b101ced-5bb5-4158-8d08-2764e7bcb265",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "h0Lop1ZkIOgViFBz",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        400,
+        -160
+      ],
+      "id": "152c2f6a-bc6e-41da-8de9-b0bad1c0eebb",
+      "name": "SerpAPI",
+      "credentials": {
+        "serpApi": {
+          "id": "XLQEapytpcay79Nj",
+          "name": "SerpApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        660,
+        -180
+      ],
+      "id": "3937cf38-7adf-4d7e-b1c7-442ed148e4b3",
+      "name": "数据合并"
+    },
+    {
+      "parameters": {
+        "content": "## 钉钉机器人鉴权\n**处理鉴权，用了官方的python 方法；\n相关文档：https://open.dingtalk.com/document/robots/custom-robot-access",
+        "height": 280,
+        "width": 600
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        100,
+        20
+      ],
+      "typeVersion": 1,
+      "id": "579e6fbe-43f3-4c91-b4b1-e6f91c2b36ea",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "变量设置",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "签名处理": {
+      "main": [
+        [
+          {
+            "node": "数据合并",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "变量设置": {
+      "main": [
+        [
+          {
+            "node": "签名处理",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "数据合并",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "数据合并": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ef1c64ee-076b-4cbb-8089-e99cb4255854",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a2cb288ba7542e0372d2a4cef94fccbcb44e1e46acff368e7edf80b48ff431a1"
+  },
+  "id": "PSxzfjxobprcGgij",
+  "tags": []
+}
